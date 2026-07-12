@@ -77,11 +77,14 @@ function openMain(){
   show('screen-main');
 }
 
+function visibleGoals(){
+  return (state && state.goals ? state.goals : []).filter(g => !g.archived);
+}
 function renderMain(){
-  const hasGoals = state && state.goals && state.goals.length;
-  $('#main-empty').hidden = !!hasGoals;
-  $('#carousel-wrap').hidden = !hasGoals;
-  if(hasGoals) buildCarousel(state.goals);
+  const has = visibleGoals().length > 0;
+  $('#main-empty').hidden = has;
+  $('#carousel-wrap').hidden = !has;
+  if(has) buildCarousel(state.goals);
 }
 
 function ringSVG(pct){
@@ -101,7 +104,8 @@ function ringSVG(pct){
 
 function buildCarousel(goals){
   const car = $('#carousel');
-  car.innerHTML = goals.map((g,i)=>{
+  const vis = goals.map((g,i)=>({g,i})).filter(o => !o.g.archived);
+  car.innerHTML = vis.map(({g,i})=>{
     const pct = Math.round(g.completed/g.target*100);
     const remaining = Math.max(0, g.target - g.completed);
     return `
@@ -127,7 +131,7 @@ function buildCarousel(goals){
 
   // dots
   const dots = $('#dots');
-  dots.innerHTML = goals.map((_,i)=>`<span class="dot${i===0?' active':''}"></span>`).join('');
+  dots.innerHTML = vis.map((_,i)=>`<span class="dot${i===0?' active':''}"></span>`).join('');
 
   // card tap → detail
   $$('.goal-card', car).forEach(c=>{
@@ -166,9 +170,12 @@ function enableDrag(el){
 /* ============================================================
    GOAL DETAIL
    ============================================================ */
+let currentDetailIdx = null;
+
 function openDetail(idx){
   const g = state.goals[idx];
   if(!g) return;
+  currentDetailIdx = idx;
   const pct = Math.round(g.completed/g.target*100);
 
   $('#d-title').textContent   = g.title;
@@ -191,39 +198,72 @@ function openDetail(idx){
   buildBigChart(pct);
 
   $('#d-tooltip').classList.remove('hidden');
+  $('#more-menu').classList.add('hidden');
   show('screen-detail');
 }
 
+/* uniform progress-bar: all bars same height, filled white + green marker + faint rest */
 function buildMiniBars(pct){
-  const n = 22;
-  const activeCount = Math.round(pct/100*n);
-  const heights = [30,45,38,55,60,48,66,72,58,80,90,86,74,62,50,40,34,28,24,20,18,16];
+  const n = 24;
+  const active = Math.round(pct/100*n);
   let html='';
   for(let i=0;i<n;i++){
     let cls='';
-    if(i === activeCount) cls='g';          // the leading green bar
-    else if(i > activeCount) cls='dim';     // remaining
-    html += `<i class="${cls}" style="height:${heights[i]}%"></i>`;
+    if(i < active) cls='';        // completed (white)
+    else if(i === active) cls='g';// current marker (green)
+    else cls='dim';               // remaining (faint)
+    html += `<i class="${cls}"></i>`;
   }
   $('#d-minibars').innerHTML = html;
 }
 
+/* cumulative progress over time: x = time, y = sessions, monotonically increasing */
 function buildBigChart(pct){
-  // 40 bars mimicking the weekly progress chart, a few highlighted green
-  const heights = [14,32,26,18,40,55,30,22,46,58,52,44,30,38,42,36,88,58,40,30,
-                   34,72,80,76,90,52,44,36,28,60,50,42,34,26,20,16,14,12,10,8];
-  const greenIdx = new Set([16, 21, 24]);
-  const activeUpto = Math.round(pct/100*heights.length);
+  const n = 40;
+  const active = Math.max(1, Math.round(pct/100*n));
   let html='';
-  heights.forEach((h,i)=>{
-    const g = greenIdx.has(i);
-    html += `<i class="${g?'g':''}" style="height:${h}%"></i>`;
-  });
+  for(let i=0;i<n;i++){
+    let h, cls='';
+    if(i < active){
+      // ascending from ~20% up to ~90% across elapsed time
+      h = 20 + (active > 1 ? (i/(active-1)) : 1) * 68;
+      if(i === active-1) cls='g';   // latest session highlighted
+    } else {
+      h = 12; cls='dim';            // future days, flat & faint
+    }
+    html += `<i class="${cls}" style="height:${h.toFixed(1)}%"></i>`;
+  }
   $('#d-barchart').innerHTML = html;
 }
 
 /* tooltip close */
 $('.tt-close').addEventListener('click', ()=> $('#d-tooltip').classList.add('hidden'));
+
+/* ⋮ dropdown: archive / delete */
+const moreBtn = $('#btn-more');
+const moreMenu = $('#more-menu');
+moreBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  moreMenu.classList.toggle('hidden');
+});
+document.addEventListener('click', e=>{
+  if(!moreMenu.classList.contains('hidden') &&
+     !moreMenu.contains(e.target) && !moreBtn.contains(e.target)){
+    moreMenu.classList.add('hidden');
+  }
+});
+$$('.dd-item', moreMenu).forEach(item=>{
+  item.addEventListener('click', ()=>{
+    const act = item.dataset.action;
+    if(currentDetailIdx != null && state && state.goals[currentDetailIdx]){
+      if(act === 'delete') state.goals.splice(currentDetailIdx, 1);
+      else if(act === 'archive') state.goals[currentDetailIdx].archived = true;
+      saveState(state);
+    }
+    moreMenu.classList.add('hidden');
+    openMain();
+  });
+});
 
 /* ============================================================
    CREATE GOAL
