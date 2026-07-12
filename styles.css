@@ -2,6 +2,7 @@
    Goals — iOS prototype styles
    ============================================================ */
 :root{
+  --content-top-gap:18px;
   /* card colors from the brief */
   --card-1:#547098;
   --card-2:#132848;
@@ -154,7 +155,7 @@ body{
 .empty-title{font-size:20px;font-weight:600;margin:6px 0 0;}
 .empty-sub{font-size:14px;color:var(--ink-dim);margin:0;}
 
-.carousel-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;padding-top:28px;}
+.carousel-wrap{flex:1;display:flex;flex-direction:column;justify-content:flex-start;min-height:0;padding-top:var(--content-top-gap);}
 .carousel{
   display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
@@ -288,13 +289,26 @@ body{
   box-shadow:0 0 10px rgba(73,240,54,.6);pointer-events:none;
 }
 
-.target-row{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:26px;}
+.target-row{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:26px;position:relative;}
 .target-label{font-size:18px;color:var(--ink-dim);}
 .target-val{
   background:none;border:none;color:#fff;font-family:var(--font);font-size:26px;font-weight:700;
   display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 2px;
 }
 .target-val:active{opacity:.6;}
+
+.target-menu{
+  position:absolute;right:0;bottom:46px;z-index:55;width:112px;max-height:220px;overflow-y:auto;
+  background:rgba(28,34,44,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:6px;
+  box-shadow:0 18px 40px rgba(0,0,0,.5);animation:dd-in .16s ease;
+}
+.target-menu.hidden{display:none;}
+.target-option{
+  width:100%;background:none;border:none;color:#fff;font-family:var(--font);
+  font-size:20px;font-weight:700;text-align:center;padding:10px 8px;border-radius:12px;cursor:pointer;
+}
+.target-option:active,.target-option.active{background:rgba(255,255,255,.12);}
 
 .date-card{padding:8px 24px;}
 .date-row{display:flex;align-items:center;justify-content:space-between;padding:20px 0;}
@@ -426,7 +440,7 @@ body{
 .toggle:not(.on) .toggle-txt{left:auto;right:11px;}
 
 /* ==================== APPLE HEALTH ==================== */
-.health-body{flex:1;display:flex;align-items:center;justify-content:center;padding:0 22px;}
+.health-body{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:var(--content-top-gap) 22px 0;}
 .health-card{width:100%;padding:34px 24px 26px;display:flex;flex-direction:column;align-items:center;text-align:center;}
 .heart-icon{
   width:96px;height:96px;border-radius:26px;background:rgba(0,0,0,.25);
