@@ -7,11 +7,7 @@ const STORAGE_KEY = 'goals_proto_v1';
 const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-/* ---------- inject status bar into every screen ---------- */
-(function injectStatusBar(){
-  const tpl = $('#statusbar-tpl');
-  $$('.sb-slot').forEach(slot => slot.appendChild(tpl.content.cloneNode(true)));
-})();
+/* ---------- status bars are intentionally hidden to maximize content space ---------- */
 
 /* ---------- state ---------- */
 function loadState(){
@@ -393,13 +389,14 @@ $('#btn-connect').addEventListener('click', function(){
   if(this.classList.contains('connected')){ openMain(); return; }
   this.classList.add('connected');
   this.textContent = 'Connected ✓';
-  setTimeout(openMain, 650);
+  setTimeout(openCreate, 650);
 });
-$('#btn-skip').addEventListener('click', openMain);
-$('#health-close').addEventListener('click', openMain);
+$('#btn-skip').addEventListener('click', openCreate);
+$('#health-close').addEventListener('click', openCreate);
 
 /* open health via debug link/param */
 function openHealth(){ show('screen-health'); }
+function openCreate(){ show('screen-create'); }
 window.openHealth = openHealth;
 
 /* ============================================================
