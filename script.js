@@ -7,11 +7,7 @@ const STORAGE_KEY = 'goals_proto_v1';
 const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-/* ---------- inject status bar into every screen ---------- */
-(function injectStatusBar(){
-  const tpl = $('#statusbar-tpl');
-  $$('.sb-slot').forEach(slot => slot.appendChild(tpl.content.cloneNode(true)));
-})();
+/* ---------- status bars are intentionally hidden to maximize content space ---------- */
 
 /* ---------- state ---------- */
 function loadState(){
@@ -314,13 +310,32 @@ function attachRuler(){
   el.addEventListener('pointercancel', end);
 }
 
-/* target sessions stepper */
-const TARGETS = [8, 12, 16, 20, 24, 30, 40];
-$('#target-val').addEventListener('click', ()=>{
-  let cur = +$('#target-num').textContent;
-  let i = TARGETS.indexOf(cur);
-  i = (i + 1) % TARGETS.length;
-  $('#target-num').textContent = TARGETS[i];
+/* target sessions dropdown */
+const targetVal = $('#target-val');
+const targetMenu = $('#target-menu');
+targetMenu.innerHTML = Array.from({ length: 30 }, (_, i) => {
+  const value = i + 1;
+  return `<button class="target-option${value === 12 ? ' active' : ''}" type="button" role="option" data-target="${value}">${value}</button>`;
+}).join('');
+targetVal.addEventListener('click', e=>{
+  e.stopPropagation();
+  const isOpen = !targetMenu.classList.toggle('hidden');
+  targetVal.setAttribute('aria-expanded', String(isOpen));
+});
+$$('.target-option', targetMenu).forEach(item=>{
+  item.addEventListener('click', ()=>{
+    $('#target-num').textContent = item.dataset.target;
+    $$('.target-option', targetMenu).forEach(option => option.classList.toggle('active', option === item));
+    targetMenu.classList.add('hidden');
+    targetVal.setAttribute('aria-expanded', 'false');
+  });
+});
+document.addEventListener('click', e=>{
+  if(!targetMenu.classList.contains('hidden') &&
+     !targetMenu.contains(e.target) && !targetVal.contains(e.target)){
+    targetMenu.classList.add('hidden');
+    targetVal.setAttribute('aria-expanded', 'false');
+  }
 });
 
 /* dates: keep end >= start */
@@ -393,13 +408,14 @@ $('#btn-connect').addEventListener('click', function(){
   if(this.classList.contains('connected')){ openMain(); return; }
   this.classList.add('connected');
   this.textContent = 'Connected ✓';
-  setTimeout(openMain, 650);
+  setTimeout(openCreate, 650);
 });
-$('#btn-skip').addEventListener('click', openMain);
-$('#health-close').addEventListener('click', openMain);
+$('#btn-skip').addEventListener('click', openCreate);
+$('#health-close').addEventListener('click', openCreate);
 
 /* open health via debug link/param */
 function openHealth(){ show('screen-health'); }
+function openCreate(){ show('screen-create'); }
 window.openHealth = openHealth;
 
 /* ============================================================
@@ -413,6 +429,9 @@ function resetPrototype(){
   $('#goal-name-text').textContent = 'Walking';
   $('#activity-menu').classList.add('hidden');
   $('#target-num').textContent = '12';
+  $$('.target-option', targetMenu).forEach(option => option.classList.toggle('active', option.dataset.target === '12'));
+  targetMenu.classList.add('hidden');
+  targetVal.setAttribute('aria-expanded', 'false');
   startInput.value = '2026-03-01';
   endInput.value = '2026-03-01';
   syncDates();
