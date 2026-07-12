@@ -29,6 +29,7 @@
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 [hidden]{display:none!important;}
+button:focus,button:focus-visible,a:focus,input:focus{outline:none;}
 html,body{height:100%;}
 body{
   margin:0;
@@ -125,7 +126,10 @@ body{
 .splash-logo{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
 }
-.splash-logo-img{width:76px;height:auto;display:block;filter:drop-shadow(0 2px 14px rgba(0,0,0,.4));}
+.splash-logo-svg{
+  display:block;
+  filter:drop-shadow(0 2px 18px rgba(0,0,0,.55));
+}
 .splash-tap-hint{position:absolute;inset:0;}
 
 /* ==================== MAIN / GOALS ==================== */
@@ -147,7 +151,7 @@ body{
 .empty-title{font-size:20px;font-weight:600;margin:6px 0 0;}
 .empty-sub{font-size:14px;color:var(--ink-dim);margin:0;}
 
-.carousel-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}
+.carousel-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;padding-top:28px;}
 .carousel{
   display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;
@@ -237,12 +241,26 @@ body{
 /* ==================== CREATE GOAL ==================== */
 .create-body{flex:1;display:flex;flex-direction:column;gap:16px;padding:22px 22px 0;overflow-y:auto;}
 .create-main{padding:26px 26px 22px;display:flex;flex-direction:column;min-height:360px;}
-.goal-name-row{display:flex;align-items:center;gap:10px;}
-.goal-name-input{
+.goal-name-row{display:flex;align-items:center;gap:10px;position:relative;}
+.goal-name-btn{
+  display:inline-flex;align-items:center;gap:10px;
   background:none;border:none;color:#fff;font-family:var(--font);
-  font-size:32px;font-weight:700;padding:0;width:auto;max-width:70%;outline:none;
+  font-size:32px;font-weight:700;padding:0;cursor:pointer;outline:none;
 }
-.goal-name-input:focus{border-bottom:2px solid rgba(255,255,255,.4);}
+.goal-name-btn:active{opacity:.7;}
+.goal-name-btn .chev{margin-top:4px;}
+.activity-menu{
+  position:absolute;top:46px;left:0;z-index:50;min-width:190px;
+  background:rgba(28,34,44,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:6px;
+  box-shadow:0 18px 40px rgba(0,0,0,.5);animation:dd-in .16s ease;
+}
+.activity-menu.hidden{display:none;}
+.act-item{
+  width:100%;text-align:left;background:none;border:none;color:#fff;
+  font-family:var(--font);font-size:18px;font-weight:600;padding:12px 14px;border-radius:11px;cursor:pointer;
+}
+.act-item:active{background:rgba(255,255,255,.1);}
 .chev{opacity:.85;flex:0 0 auto;}
 
 .value-display{display:flex;justify-content:center;align-items:flex-start;margin-top:34px;flex-direction:column;align-items:center;}
@@ -279,16 +297,20 @@ body{
 .date-row{display:flex;align-items:center;justify-content:space-between;padding:20px 0;}
 .date-label{font-size:19px;color:var(--ink-dim);}
 .date-div{height:1px;background:rgba(255,255,255,.1);}
-.date-field{position:relative;display:flex;align-items:center;gap:8px;}
+.date-field{position:relative;display:flex;align-items:center;gap:10px;}
 .date-field input[type="date"]{
   background:none;border:none;color:#fff;font-family:var(--font);
   font-size:21px;font-weight:700;outline:none;padding:0;
   -webkit-appearance:none;color-scheme:dark;text-align:right;
 }
 .date-field input[type="date"]::-webkit-calendar-picker-indicator{
-  filter:invert(1);opacity:.7;cursor:pointer;margin-left:2px;
+  opacity:0;display:none;-webkit-appearance:none;
 }
-.date-field .chev{display:none;}
+.cal-btn{
+  background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;flex:0 0 auto;
+}
+.cal-btn:active{opacity:.6;}
+.cal-btn svg{display:block;}
 
 /* ==================== bottom bars & pill ==================== */
 .bottom-bar{padding:14px 22px calc(var(--safe-bottom) + 8px);flex:0 0 auto;}

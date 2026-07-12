@@ -62,8 +62,8 @@ $$('[data-nav]').forEach(btn=>{
   });
 });
 
-/* splash → main (tap anywhere) */
-$('#screen-splash').addEventListener('click', openMain);
+/* splash → Apple Health (tap anywhere) */
+$('#screen-splash').addEventListener('click', openHealth);
 
 /* main header buttons */
 $('#btn-settings').addEventListener('click', ()=> show('screen-settings'));
@@ -333,9 +333,39 @@ function syncDates(){
 startInput.addEventListener('change', syncDates);
 syncDates();
 
+/* activity picker */
+const goalNameBtn = $('#goal-name-btn');
+const activityMenu = $('#activity-menu');
+goalNameBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  activityMenu.classList.toggle('hidden');
+});
+$$('.act-item', activityMenu).forEach(item=>{
+  item.addEventListener('click', ()=>{
+    $('#goal-name-text').textContent = item.dataset.act;
+    activityMenu.classList.add('hidden');
+  });
+});
+document.addEventListener('click', e=>{
+  if(!activityMenu.classList.contains('hidden') &&
+     !activityMenu.contains(e.target) && !goalNameBtn.contains(e.target)){
+    activityMenu.classList.add('hidden');
+  }
+});
+
+/* white calendar buttons open the native picker */
+$$('.cal-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const input = document.getElementById(btn.dataset.for);
+    if(input && typeof input.showPicker === 'function'){
+      try { input.showPicker(); } catch { input.focus(); }
+    } else if(input){ input.focus(); }
+  });
+});
+
 /* create */
 $('#btn-create').addEventListener('click', ()=>{
-  const title = ($('#goal-name').value || 'Walking').trim() || 'Walking';
+  const title = ($('#goal-name-text').textContent || 'Walking').trim() || 'Walking';
   const target = +$('#target-num').textContent;
   const completed = Math.max(1, Math.round(target * 0.5)); // demo: ~50%
   const userGoal = {
@@ -354,16 +384,16 @@ $('#btn-create').addEventListener('click', ()=>{
    ============================================================ */
 $('#toggle-push').addEventListener('click', function(){
   this.classList.toggle('on');
-  $('.toggle-txt', this).textContent = this.classList.contains('on') ? 'on' : 'off';
 });
 
 /* ============================================================
    APPLE HEALTH (debug screen)
    ============================================================ */
 $('#btn-connect').addEventListener('click', function(){
-  if(this.classList.contains('connected')) return;
+  if(this.classList.contains('connected')){ openMain(); return; }
   this.classList.add('connected');
   this.textContent = 'Connected ✓';
+  setTimeout(openMain, 650);
 });
 $('#btn-skip').addEventListener('click', openMain);
 $('#health-close').addEventListener('click', openMain);
@@ -380,13 +410,16 @@ function resetPrototype(){
   state = null;
   // reset create-goal form
   RULER.value = 30; positionRuler();
-  $('#goal-name').value = 'Walking';
+  $('#goal-name-text').textContent = 'Walking';
+  $('#activity-menu').classList.add('hidden');
   $('#target-num').textContent = '12';
   startInput.value = '2026-03-01';
   endInput.value = '2026-03-01';
   syncDates();
   $('#toggle-push').classList.add('on');
-  $('.toggle-txt', $('#toggle-push')).textContent = 'on';
+  // reset health connect button
+  const cb = $('#btn-connect');
+  cb.classList.remove('connected'); cb.textContent = 'Connect';
   show('screen-splash');
 }
 window.resetPrototype = resetPrototype;
