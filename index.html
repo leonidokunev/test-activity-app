@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Goals — Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="device" id="device">
+    <div class="device-notch"></div>
+
+    <!-- ======================= STATUS BAR ======================= -->
+    <template id="statusbar-tpl">
+      <div class="statusbar">
+        <span class="sb-time">10:56</span>
+        <span class="sb-right">
+          <svg class="sb-signal" width="18" height="12" viewBox="0 0 18 12" fill="none">
+            <rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/>
+            <rect x="5" y="5" width="3" height="7" rx="1" fill="currentColor"/>
+            <rect x="10" y="2.5" width="3" height="9.5" rx="1" fill="currentColor"/>
+            <rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/>
+          </svg>
+          <span class="sb-lte">LTE</span>
+          <svg class="sb-batt" width="27" height="13" viewBox="0 0 27 13" fill="none">
+            <rect x="0.5" y="0.5" width="22" height="12" rx="3.5" stroke="currentColor" opacity="0.5"/>
+            <rect x="2" y="2" width="19" height="9" rx="2" fill="currentColor"/>
+            <rect x="24" y="4" width="2" height="5" rx="1" fill="currentColor" opacity="0.5"/>
+          </svg>
+        </span>
+      </div>
+    </template>
+
+    <!-- ======================= 1. SPLASH ======================= -->
+    <section class="screen screen--splash active" id="screen-splash" data-bg="splash">
+      <div class="sb-slot"></div>
+      <div class="splash-tap-hint"></div>
+      <div class="splash-logo">
+        <svg viewBox="0 0 120 120" width="72" height="72" aria-hidden="true">
+          <g fill="#ffffff">
+            <!-- center diamond -->
+            <circle cx="60" cy="52" r="4.5"/>
+            <circle cx="60" cy="68" r="4.5"/>
+            <circle cx="52" cy="60" r="4.5"/>
+            <circle cx="68" cy="60" r="4.5"/>
+            <circle cx="60" cy="60" r="4"/>
+            <!-- vertical arm -->
+            <circle cx="60" cy="38" r="3.6"/>
+            <circle cx="60" cy="24" r="2.8"/>
+            <circle cx="60" cy="82" r="3.6"/>
+            <circle cx="60" cy="96" r="2.8"/>
+            <!-- horizontal arm -->
+            <circle cx="38" cy="60" r="3.6"/>
+            <circle cx="24" cy="60" r="2.8"/>
+            <circle cx="82" cy="60" r="3.6"/>
+            <circle cx="96" cy="60" r="2.8"/>
+            <!-- diagonals -->
+            <circle cx="47" cy="47" r="3.2"/>
+            <circle cx="36" cy="36" r="2.4"/>
+            <circle cx="73" cy="47" r="3.2"/>
+            <circle cx="84" cy="36" r="2.4"/>
+            <circle cx="47" cy="73" r="3.2"/>
+            <circle cx="36" cy="84" r="2.4"/>
+            <circle cx="73" cy="73" r="3.2"/>
+            <circle cx="84" cy="84" r="2.4"/>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ======================= 2. MAIN (GOALS) ======================= -->
+    <section class="screen screen--main" id="screen-main" data-bg="black">
+      <div class="sb-slot"></div>
+      <header class="main-head">
+        <h1 class="screen-title">GOALS</h1>
+        <button class="grid-btn" id="btn-settings" aria-label="Settings">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor">
+            <circle cx="4" cy="4" r="2"/><circle cx="11" cy="4" r="2"/><circle cx="18" cy="4" r="2"/>
+            <circle cx="4" cy="11" r="2"/><circle cx="11" cy="11" r="2"/><circle cx="18" cy="11" r="2"/>
+            <circle cx="4" cy="18" r="2"/><circle cx="11" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Empty state -->
+      <div class="main-empty" id="main-empty">
+        <div class="empty-ring">
+          <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
+            <circle cx="45" cy="45" r="40" stroke="rgba(255,255,255,.14)" stroke-width="2" stroke-dasharray="4 6"/>
+            <path d="M45 30v30M30 45h30" stroke="rgba(255,255,255,.4)" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="empty-title">No goals yet</p>
+        <p class="empty-sub">Tap + to create your first goal</p>
+      </div>
+
+      <!-- Filled: carousel -->
+      <div class="carousel-wrap" id="carousel-wrap" hidden>
+        <div class="carousel" id="carousel"></div>
+        <div class="dots" id="dots"></div>
+      </div>
+
+      <button class="fab" id="btn-add" aria-label="Create goal">
+        <svg width="26" height="26" viewBox="0 0 26 26"><path d="M13 5v16M5 13h16" stroke="#111" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </button>
+    </section>
+
+    <!-- ======================= 3. CREATE GOAL ======================= -->
+    <section class="screen screen--create" id="screen-create" data-bg="blue">
+      <div class="sb-slot"></div>
+      <header class="nav-head">
+        <button class="circle-btn" data-nav="main" aria-label="Back">
+          <svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 3 10l7 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <h1 class="screen-title">CREATE GOAL</h1>
+        <span class="circle-btn ghost"></span>
+      </header>
+
+      <div class="create-body">
+        <div class="glass-card create-main">
+          <div class="goal-name-row">
+            <input class="goal-name-input" id="goal-name" value="Walking" spellcheck="false" />
+            <svg class="chev" width="16" height="10" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          </div>
+
+          <div class="value-display">
+            <span class="value-num" id="value-num">30</span>
+            <span class="value-unit">min</span>
+          </div>
+
+          <div class="ruler" id="ruler">
+            <div class="ruler-track" id="ruler-track"></div>
+            <div class="ruler-center"></div>
+          </div>
+
+          <div class="target-row">
+            <span class="target-label">Target (sessions)</span>
+            <button class="target-val" id="target-val">
+              <span id="target-num">12</span>
+              <svg class="chev" width="14" height="9" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card date-card">
+          <div class="date-row">
+            <span class="date-label">Start date</span>
+            <div class="date-field">
+              <input type="date" id="start-date" value="2026-03-01" />
+              <svg class="chev" width="13" height="8" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="date-div"></div>
+          <div class="date-row">
+            <span class="date-label">End date</span>
+            <div class="date-field">
+              <input type="date" id="end-date" value="2026-03-01" />
+              <svg class="chev" width="13" height="8" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pill-btn" id="btn-create">Create Goal</button>
+      </div>
+    </section>
+
+    <!-- ======================= 4. GOAL DETAIL ======================= -->
+    <section class="screen screen--detail" id="screen-detail" data-bg="blue">
+      <div class="sb-slot"></div>
+      <header class="nav-head">
+        <button class="circle-btn" data-nav="main" aria-label="Back">
+          <svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 3 10l7 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <h1 class="screen-title">GOAL DETAIL</h1>
+        <button class="circle-btn" aria-label="More">
+          <svg width="5" height="20" viewBox="0 0 5 20" fill="#fff"><circle cx="2.5" cy="3" r="2.3"/><circle cx="2.5" cy="10" r="2.3"/><circle cx="2.5" cy="17" r="2.3"/></svg>
+        </button>
+      </header>
+
+      <div class="detail-body">
+        <div class="detail-top">
+          <div class="glass-card mini-card">
+            <div class="mini-title" id="d-title">Walking</div>
+            <div class="mini-month" id="d-month">Mar 2026</div>
+            <div class="mini-bars" id="d-minibars"></div>
+            <div class="mini-scale"><span>0</span><span>50</span><span>100</span></div>
+            <div class="mini-pct"><span class="mini-pct-num" id="d-pct">50</span><span class="mini-pct-sym">%</span></div>
+          </div>
+
+          <div class="glass-card compare-card">
+            <div class="compare-title">Current week vs. Previous Week</div>
+            <div class="compare-block">
+              <div class="compare-head"><span>This Week</span><span class="compare-val"><b id="d-thisweek">50</b> %</span></div>
+              <div class="dotline" data-pct="50"></div>
+              <div class="dotline-scale"><span>0</span><span>50</span><span>100</span></div>
+            </div>
+            <div class="compare-block">
+              <div class="compare-head"><span>Previous Week</span><span class="compare-val"><b id="d-prevweek">30</b> %</span></div>
+              <div class="dotline" data-pct="30"></div>
+              <div class="dotline-scale"><span>0</span><span>50</span><span>100</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card progress-card">
+          <div class="progress-head">
+            <span class="progress-title">Progress</span>
+            <span class="progress-week">This Week
+              <svg width="14" height="9" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            </span>
+          </div>
+          <div class="progress-month" id="d-month2">Mar 2026</div>
+          <div class="progress-sessions" id="d-sessions">12 sessions</div>
+
+          <div class="progress-chart-area">
+            <div class="tooltip" id="d-tooltip">
+              <button class="tt-close" aria-label="Close">
+                <svg width="9" height="9" viewBox="0 0 10 10"><path d="M1 1l8 8M9 1l-8 8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </button>
+              <div class="tt-title"><span class="tt-dot"></span>You're at <b id="d-ttpct">50</b>%.</div>
+              <div class="tt-sub">At 2.3/week you'll reach the target in time.</div>
+            </div>
+            <div class="bar-chart" id="d-barchart"></div>
+            <div class="bar-days">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span class="active">Sat</span><span>Sun</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <button class="pill-btn" data-nav="create">Create Goal</button>
+      </div>
+    </section>
+
+    <!-- ======================= 5. SETTINGS (PROFILE) ======================= -->
+    <section class="screen screen--settings" id="screen-settings" data-bg="black">
+      <div class="sb-slot"></div>
+      <header class="nav-head">
+        <button class="plain-back" data-nav="main" aria-label="Back">
+          <svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 3 10l7 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <h1 class="screen-title">PROFILE</h1>
+        <span class="plain-back ghost"></span>
+      </header>
+
+      <div class="settings-body">
+        <div class="pro-card">
+          <span class="pro-pill"><span class="pro-dot"></span>Unlock Pro</span>
+          <div class="pro-h">You're at 60%</div>
+          <div class="pro-sub">Keep the momentum going</div>
+          <button class="upgrade-btn">Upgrade</button>
+        </div>
+
+        <div class="settings-list">
+          <div class="set-row">
+            <span>Push remainders</span>
+            <button class="toggle on" id="toggle-push"><span class="toggle-txt">on</span><span class="toggle-knob"></span></button>
+          </div>
+          <div class="set-row">
+            <span>Reminder time</span>
+            <span class="set-val">10 min <svg class="chev" width="13" height="8" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span>
+          </div>
+          <div class="set-row"><span>Re-connect Apple Health</span><svg class="chev" width="13" height="8" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="set-row"><span>Leave review</span><svg class="chev" width="13" height="8" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="set-row"><span>Get in touch</span><svg class="chev" width="13" height="8" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="set-row"><span>Restore purchase</span><svg class="chev" width="13" height="8" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="set-row"><span>Achivments</span><svg class="chev" width="13" height="8" viewBox="0 0 16 10"><path d="M2 2l6 6 6-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= 6. APPLE HEALTH CONNECT (debug) ======================= -->
+    <section class="screen screen--health" id="screen-health" data-bg="blue">
+      <div class="sb-slot"></div>
+      <header class="nav-head nav-head--health">
+        <button class="circle-btn" id="health-close" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 2l12 12M14 2L2 14" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+
+      <div class="health-body">
+        <div class="glass-card health-card">
+          <div class="heart-icon">
+            <svg width="56" height="52" viewBox="0 0 56 52"><path d="M28 50S4 34 4 17C4 8 11 3 18 3c5 0 9 3 10 6 1-3 5-6 10-6 7 0 14 5 14 14 0 17-24 33-24 33z" fill="url(#hg)"/><defs><radialGradient id="hg" cx="50%" cy="42%" r="60%"><stop offset="0%" stop-color="#ff5a6e"/><stop offset="60%" stop-color="#e51d3a"/><stop offset="100%" stop-color="#8f0f22"/></radialGradient></defs></svg>
+          </div>
+          <h2 class="health-title">Connect Apple Helth</h2>
+          <p class="health-sub">We pull your activity data to set smarter goals. Everything stays on your device.</p>
+
+          <div class="health-list">
+            <div class="health-item"><span class="hi-left"><svg class="hi-check" width="16" height="16" viewBox="0 0 16 16"><path d="M2 8l4 4 8-9" stroke="#49F036" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Worouts</span><span class="hi-right">Read only</span></div>
+            <div class="health-div"></div>
+            <div class="health-item"><span class="hi-left"><svg class="hi-check" width="16" height="16" viewBox="0 0 16 16"><path d="M2 8l4 4 8-9" stroke="#49F036" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Steps &amp; distanse</span><span class="hi-right">Read only</span></div>
+            <div class="health-div"></div>
+            <div class="health-item"><span class="hi-left"><svg class="hi-check" width="16" height="16" viewBox="0 0 16 16"><path d="M2 8l4 4 8-9" stroke="#49F036" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Active energy</span><span class="hi-right">Read only</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="health-bottom">
+        <button class="pill-btn" id="btn-connect">Connect</button>
+        <button class="skip-btn" id="btn-skip">Skip for now</button>
+      </div>
+    </section>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
